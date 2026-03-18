@@ -1,4 +1,6 @@
-const API_URL = 'http://localhost:5000/api';
+const DEFAULT_BACKEND_URL = 'https://smart-dustbin-management-iot-1.onrender.com';
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || DEFAULT_BACKEND_URL).replace(/\/$/, '');
+const API_URL = `${BACKEND_URL}/api`;
 
 export const dustbinAPI = {
   getAll: async () => {

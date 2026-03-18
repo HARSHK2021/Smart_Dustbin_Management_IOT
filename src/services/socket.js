@@ -1,12 +1,15 @@
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:5000';
+const DEFAULT_BACKEND_URL = 'https://smart-dustbin-management-iot-1.onrender.com';
+const SOCKET_URL = (import.meta.env.VITE_BACKEND_URL || DEFAULT_BACKEND_URL).replace(/\/$/, '');
 
 let socket = null;
 
 export const initSocket = () => {
   if (!socket) {
-    socket = io(SOCKET_URL);
+    socket = io(SOCKET_URL, {
+      transports: ['websocket', 'polling'],
+    });
   }
   return socket;
 };
