@@ -75,8 +75,20 @@ export default function Home() {
   return (
     <div className="home-page">
       <header className="page-header">
-        <h1>Smart Dustbin Monitoring System</h1>
-        <p>Track and manage waste collection in real-time</p>
+        <div className="navbar">
+          <div className="navbar-left">
+            <div className="logo-mark">SD</div>
+            <div className="brand-text">
+              <h1>Smart Dustbin</h1>
+              <span>Real-time Waste Monitoring</span>
+            </div>
+          </div>
+          <nav className="navbar-links">
+            <span className="nav-pill">Live Map</span>
+            <span className="nav-pill">Dustbin Status</span>
+            <span className="nav-pill nav-pill-accent">Report Issue</span>
+          </nav>
+        </div>
       </header>
 
       <div className="map-section">

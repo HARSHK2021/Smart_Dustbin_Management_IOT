@@ -8,6 +8,7 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [loading, setLoading] = useState(false);
+  const [usingLiveLocation, setUsingLiveLocation] = useState(false);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -29,6 +30,29 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUseLiveLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      return;
+    }
+
+    setUsingLiveLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        setLatitude(lat.toString());
+        setLongitude(lng.toString());
+        setUsingLiveLocation(false);
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        alert('Unable to fetch your live location. Please allow location access or enter coordinates manually.');
+        setUsingLiveLocation(false);
+      }
+    );
   };
 
   const handleDelete = async (id) => {
@@ -86,6 +110,16 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
                   required
                 />
               </div>
+            </div>
+            <div className="form-group">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleUseLiveLocation}
+                disabled={usingLiveLocation}
+              >
+                {usingLiveLocation ? 'Fetching live location...' : 'Use live location'}
+              </button>
             </div>
             <button
               type="submit"
