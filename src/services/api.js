@@ -54,6 +54,17 @@ export const messageAPI = {
   getAll: async () => {
     const response = await fetch(`${API_URL}/messages`);
     return response.json();
+  },
+
+  deleteById: async (messageId) => {
+    const response = await fetch(`${API_URL}/messages/${encodeURIComponent(messageId)}`, {
+      method: 'DELETE'
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
+    }
+    return data;
   }
 };
 

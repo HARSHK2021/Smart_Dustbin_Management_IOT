@@ -133,7 +133,11 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'messages' && (
-            <MessageManagement messages={messages} />
+            <MessageManagement
+              messages={messages}
+              onRefresh={loadData}
+              onDelete={(messageId) => setMessages(prev => prev.filter(m => m.messageId !== messageId))}
+            />
           )}
         </div>
       </div>

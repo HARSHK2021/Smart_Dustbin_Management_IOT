@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getAllMessages } = require('../controllers/messageController');
+const { getAllMessages, deleteMessage } = require('../controllers/messageController');
 
 router.get('/', getAllMessages);
+router.delete('/:messageId', deleteMessage);
 
 module.exports = router;

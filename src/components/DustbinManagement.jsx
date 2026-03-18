@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { dustbinAPI } from '../services/api';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useGeolocation } from '../hooks/useGeolocation';
 
 export default function DustbinManagement({ dustbins, onRefresh }) {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -9,6 +10,15 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
   const [longitude, setLongitude] = useState('');
   const [loading, setLoading] = useState(false);
   const [usingLiveLocation, setUsingLiveLocation] = useState(false);
+  const mapRef = useRef(null);
+  const { location: adminLocation } = useGeolocation();
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !adminLocation) return;
+
+    map.setView([adminLocation.latitude, adminLocation.longitude], 14, { animate: true, duration: 0.6 });
+  }, [adminLocation]);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -53,6 +63,17 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
         setUsingLiveLocation(false);
       }
     );
+  };
+
+  const focusOnDustbin = (dustbin) => {
+    const lat = Number(dustbin?.latitude);
+    const lng = Number(dustbin?.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    const map = mapRef.current;
+    if (map) {
+      map.setView([lat, lng], Math.max(map.getZoom(), 16), { animate: true, duration: 0.6 });
+    }
   };
 
   const handleDelete = async (id) => {
@@ -136,9 +157,13 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
         <h3>Dustbin Locations</h3>
         <div className="map-container-admin">
           <MapContainer
-            center={[23.25, 77.41]}
+            center={[
+              adminLocation?.latitude ?? 23.25,
+              adminLocation?.longitude ?? 77.41
+            ]}
             zoom={13}
             style={{ height: '400px', width: '100%' }}
+            ref={mapRef}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -148,6 +173,9 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
               <Marker
                 key={dustbin.id}
                 position={[dustbin.latitude, dustbin.longitude]}
+                eventHandlers={{
+                  click: () => focusOnDustbin(dustbin),
+                }}
               >
                 <Popup>
                   <strong>{dustbin.id}</strong><br />
@@ -175,7 +203,11 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
           </thead>
           <tbody>
             {dustbins.map(dustbin => (
-              <tr key={dustbin.id}>
+              <tr
+                key={dustbin.id}
+                className="clickable-row"
+                onClick={() => focusOnDustbin(dustbin)}
+              >
                 <td>{dustbin.id}</td>
                 <td>
                   <span className={`status-badge status-${dustbin.status.toLowerCase()}`}>
@@ -187,8 +219,21 @@ export default function DustbinManagement({ dustbins, onRefresh }) {
                 <td>{new Date(dustbin.lastUpdated).toLocaleString()}</td>
                 <td>
                   <button
+                    className="btn btn-sm btn-secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      focusOnDustbin(dustbin);
+                    }}
+                    style={{ marginRight: 8 }}
+                  >
+                    View on map
+                  </button>
+                  <button
                     className="btn btn-sm btn-danger"
-                    onClick={() => handleDelete(dustbin.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(dustbin.id);
+                    }}
                   >
                     Delete
                   </button>

@@ -783,6 +783,14 @@ tr:hover {
   background: #f8f9fa;
 }
 
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:active {
+  background: #eef2f7;
+}
+
 .description-cell {
   max-width: 300px;
   white-space: nowrap;
