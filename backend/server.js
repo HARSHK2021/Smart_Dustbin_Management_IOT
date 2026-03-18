@@ -32,6 +32,10 @@ app.use('/api/dustbins', dustbinRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/messages', messageRoutes);
 
+app.get('/', (req, res) => {
+  res.status(200).send('Hello welcome to smart dustbin management backend');
+});
+
 app.get('/update', (req, res) => {
   const dustbinController = require('./controllers/dustbinController');
   dustbinController.updateDustbin(req, res, io);
