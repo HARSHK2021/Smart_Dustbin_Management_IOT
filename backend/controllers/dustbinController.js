@@ -3,8 +3,10 @@ const Message = require('../models/Message');
 
 const updateDustbin = async (req, res, io) => {
   try {
+    
     const { id, level, status, lat, lng } = req.query;
     console.log(id, level, status, lat, lng);
+    console.log("Incoming request:", req.query);
 
     if (!id || level === undefined || !status || !lat || !lng) {
       return res.status(400).json({ error: 'Missing required parameters' });
@@ -48,7 +50,9 @@ const updateDustbin = async (req, res, io) => {
 
     io.emit('dustbinUpdate', dustbin);
 
-    res.json({ success: true, dustbin });
+    res.set('Connection', 'close');
+res.set('Content-Type', 'application/json');
+res.status(200).send(JSON.stringify({ success: true }));
   } catch (error) {
     console.error('Error updating dustbin:', error);
     res.status(500).json({ error: 'Server error' });
